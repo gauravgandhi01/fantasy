@@ -1457,6 +1457,66 @@ def render_html(data: dict[str, Any]) -> str:
     tr:last-child td {{ border-bottom: 0; }}
     .num {{ text-align: right; font-variant-numeric: tabular-nums; }}
     .muted {{ color: var(--muted); }}
+    .h2h-matrix-wrap {{
+      overflow: auto;
+      max-height: 68vh;
+    }}
+    .h2h-matrix {{
+      width: max-content;
+      min-width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #fff;
+    }}
+    .h2h-matrix th,
+    .h2h-matrix td {{
+      padding: 6px 8px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      line-height: 1.25;
+      white-space: nowrap;
+      vertical-align: middle;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }}
+    .h2h-matrix thead th {{
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: #f1f4f6;
+      text-transform: none;
+      font-size: 11px;
+      font-weight: 760;
+      cursor: default;
+    }}
+    .h2h-matrix .h2h-corner {{
+      left: 0;
+      z-index: 5;
+      min-width: 190px;
+      text-align: left;
+    }}
+    .h2h-matrix .h2h-row-head {{
+      position: sticky;
+      left: 0;
+      z-index: 4;
+      background: #f8fafc;
+      text-align: left;
+      font-weight: 700;
+      min-width: 190px;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    .h2h-matrix .h2h-cell {{
+      min-width: 62px;
+      max-width: 68px;
+    }}
+    .h2h-matrix .h2h-diag {{
+      background: #f9fafb;
+      color: #98a2b3;
+      font-weight: 700;
+    }}
     .badge {{
       display: inline-flex;
       align-items: center;
@@ -2663,6 +2723,64 @@ def render_html(data: dict[str, Any]) -> str:
         .sort((a, b) => b.games - a.games || managerName(a.manager_a_key).localeCompare(managerName(b.manager_a_key)) || managerName(a.manager_b_key).localeCompare(managerName(b.manager_b_key)));
     }}
 
+    function h2hMatrixTable(rows) {{
+      const managerKeys = [...new Set(
+        rows.flatMap((row) => [row.manager_a_key, row.manager_b_key]).filter((key) => !!key)
+      )].sort((a, b) => managerName(a).localeCompare(managerName(b)));
+
+      const cellMap = new Map();
+      rows.forEach((row) => {{
+        const ties = Number(row.ties || 0);
+        const aWins = Number(row.manager_a_wins || 0);
+        const bWins = Number(row.manager_b_wins || 0);
+        const ab = ties ? aWins + "-" + bWins + "-" + ties : aWins + "-" + bWins;
+        const ba = ties ? bWins + "-" + aWins + "-" + ties : bWins + "-" + aWins;
+        cellMap.set(row.manager_a_key + "::" + row.manager_b_key, ab);
+        cellMap.set(row.manager_b_key + "::" + row.manager_a_key, ba);
+      }});
+
+      const wrap = el("div", "table-wrap h2h-matrix-wrap");
+      const tbl = document.createElement("table");
+      tbl.className = "h2h-matrix";
+
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      const corner = el("th", "h2h-corner", "Manager");
+      headRow.append(corner);
+      managerKeys.forEach((key) => {{
+        const th = el("th", "", managerName(key));
+        th.title = managerName(key);
+        headRow.append(th);
+      }});
+      thead.append(headRow);
+
+      const tbody = document.createElement("tbody");
+      managerKeys.forEach((rowKey) => {{
+        const tr = document.createElement("tr");
+        const rowHead = el("th", "h2h-row-head", managerName(rowKey));
+        rowHead.title = managerName(rowKey);
+        tr.append(rowHead);
+
+        managerKeys.forEach((colKey) => {{
+          const td = el("td", "h2h-cell");
+          if (rowKey === colKey) {{
+            td.classList.add("h2h-diag");
+            td.textContent = "—";
+          }} else {{
+            const value = cellMap.get(rowKey + "::" + colKey) || "";
+            td.textContent = value || "";
+          }}
+          tr.append(td);
+        }});
+
+        tbody.append(tr);
+      }});
+
+      tbl.append(thead, tbody);
+      wrap.append(tbl);
+      return wrap;
+    }}
+
     function recordsForRange(state) {{
       const standings = filterByRange(DATA.standings, state, (row) => row.year);
       const matchups = filterByRange(DATA.matchups, state, (row) => row.year);
@@ -3144,24 +3262,11 @@ def render_html(data: dict[str, Any]) -> str:
 
       const h2hPanel = el("div", "panel");
       h2hPanel.append(el("h2", "", "Regular-Season Head-to-Head"));
-      h2hPanel.append(table(
-        [
-          {{ label: "Manager A" }},
-          {{ label: "Manager B" }},
-          {{ label: "Record" }},
-          {{ label: "Games", num: true }},
-          {{ label: "A Points", num: true }},
-          {{ label: "B Points", num: true }}
-        ],
-        scopedH2h.map((row) => [
-          managerLabel(row.manager_a_key),
-          managerLabel(row.manager_b_key),
-          row.record,
-          row.games,
-          fmt(row.points_a),
-          fmt(row.points_b)
-        ])
-      ));
+      if (scopedH2h.length) {{
+        h2hPanel.append(h2hMatrixTable(scopedH2h));
+      }} else {{
+        h2hPanel.append(el("div", "matchup-empty", "No regular-season head-to-head games for selected range."));
+      }}
       root.replaceChildren(controls, recordPanel, h2hPanel);
     }}
 
