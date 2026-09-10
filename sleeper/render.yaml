@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: true-league-sleeper
+    runtime: node
+    plan: starter
+    numInstances: 1
+    rootDir: sleeper
+    buildCommand: npm ci && npm test
+    startCommand: npm start
+    healthCheckPath: /healthz
+    disk:
+      name: sleeper-snapshots
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LEAGUE_ID
+        value: "1395542220504854528"
+      - key: DATA_DIR
+        value: /var/data/sleeper

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a17">
+  <meta name="description" content="True League's live 2026 Sleeper scoring dashboard.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="True League · 2026 Scoring Room">
+  <meta property="og:description" content="Live weekly scoring context, consistency, and rank for True League.">
+  <meta property="og:image" content="__PUBLIC_BASE_URL__/public/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="True League · 2026 Scoring Room">
+  <meta name="twitter:description" content="Live weekly scoring context, consistency, and rank for True League.">
+  <meta name="twitter:image" content="__PUBLIC_BASE_URL__/public/og.png">
+  <title>True League · 2026 Scoreboard</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to statistics</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="./" aria-label="True League home">
+        <span class="brand-mark" aria-hidden="true">TL</span>
+        <span>
+          <span class="eyebrow" id="brandSeason">Sleeper · 2026</span>
+          <strong id="brandName">True League</strong>
+        </span>
+      </a>
+      <div class="header-actions">
+        <div class="data-status" id="dataStatus" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>
+            <strong id="statusTitle">Connecting to Sleeper</strong>
+            <small id="statusDetail">Loading league data</small>
+          </span>
+        </div>
+        <button class="refresh-button" id="refreshButton" type="button">
+          <span aria-hidden="true">&#8635;</span>
+          Refresh data
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="shell">
+    <div id="noticeRegion" aria-live="polite"></div>
+
+    <nav class="section-tabs" role="tablist" aria-label="Dashboard sections">
+      <button class="section-tab active" id="overviewTab" type="button" role="tab" aria-selected="true" aria-controls="overviewView" data-view="overviewView">Scoreboard</button>
+      <button class="section-tab" id="liveTab" type="button" role="tab" aria-selected="false" aria-controls="liveView" data-view="liveView" tabindex="-1">Live Scores</button>
+      <button class="section-tab" id="weeklyTab" type="button" role="tab" aria-selected="false" aria-controls="weeklyView" data-view="weeklyView">Trends</button>
+      <button class="section-tab" id="statbookTab" type="button" role="tab" aria-selected="false" aria-controls="statbookView" data-view="statbookView">Stat book</button>
+    </nav>
+
+    <section id="overviewView" class="dashboard-view" role="tabpanel" aria-labelledby="overviewTab">
+      <section class="panel section-panel matrix-primary" aria-labelledby="matrixTitle">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow accent">Regular season · Weeks 1–14</p>
+            <h1 id="matrixTitle">Weekly scoring matrix</h1>
+          </div>
+          <div id="matrixControls" class="segmented-control" aria-label="Performance matrix metric"></div>
+        </div>
+        <div id="matrixTable" class="table-scroll"></div>
+      </section>
+      <div id="summaryGrid" class="preview-grid" aria-label="Season summary"></div>
+      <div id="overviewContent"></div>
+    </section>
+
+    <section id="liveView" class="dashboard-view" role="tabpanel" aria-labelledby="liveTab" hidden>
+      <div id="liveWeekRegion"></div>
+    </section>
+    <section id="weeklyView" class="dashboard-view" role="tabpanel" aria-labelledby="weeklyTab" hidden>
+      <section class="panel section-panel" aria-labelledby="trendTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow accent">Score trajectories</p>
+            <h2 id="trendTitle">Weekly trends</h2>
+          </div>
+          <div id="trendControls" class="team-filter" aria-label="Teams shown on chart"></div>
+        </div>
+        <div id="trendChart"></div>
+      </section>
+    </section>
+
+    <section id="statbookView" class="dashboard-view" role="tabpanel" aria-labelledby="statbookTab" hidden>
+      <div id="leagueBenchmarks" class="benchmark-grid"></div>
+      <section class="panel section-panel" aria-labelledby="statbookTitle">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow accent">Every number</p>
+            <h2 id="statbookTitle">Season stat book</h2>
+          </div>
+          <p class="section-note">Select any column to sort.</p>
+        </div>
+        <div id="statbookTable" class="table-scroll"></div>
+      </section>
+      <section class="panel section-panel glossary" aria-labelledby="glossaryTitle">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow accent">How it works</p>
+            <h2 id="glossaryTitle">Metric glossary</h2>
+          </div>
+        </div>
+        <div id="glossaryGrid" class="glossary-grid"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <span>True League · 2026 regular season</span>
+      <span>League data from <a href="https://sleeper.com/" rel="noreferrer">Sleeper</a></span>
+    </div>
+  </footer>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

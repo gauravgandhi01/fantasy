@@ -1,0 +1,13 @@
+{
+  "name": "true-league-sleeper-dashboard",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "test": "node ./tests/run-tests.mjs && node --test tests/backend.test.js",
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "serve": "npm start"
+  },
+  "dependencies": { "express": "^5.1.0" }
+}
