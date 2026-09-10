@@ -360,16 +360,6 @@ h2 { max-width: 640px; font-size: clamp(1.45rem, 3vw, 2.35rem); }
 .matrix-live-head { color: var(--accent-soft) !important; }
 .matrix-live-label { display: block; margin-top: 2px; color: var(--accent-soft); font-size: .56rem; letter-spacing: .08em; }
 .matrix-live-cell { box-shadow: inset 2px 0 0 var(--line), inset -2px 0 0 var(--line); }
-.matrix-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; padding: 14px 2px 0; color: var(--muted); font-size: .72rem; }
-.matrix-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.matrix-legend span::before { width: 9px; height: 9px; border-radius: 3px; content: ""; }
-.matrix-legend .legend-great::before { background: var(--positive); }
-.matrix-legend .legend-average::before { background: var(--muted); }
-.matrix-legend .legend-bad::before { background: var(--negative); }
-.matrix-legend small { margin-left: auto; font-size: inherit; }
-.heat-great { background-color: var(--positive-bg); color: var(--positive); font-weight: 800; }
-.heat-bad { background-color: var(--negative-bg); color: var(--negative); font-weight: 800; }
-.heat-average { background-color: var(--subtle); }
 
 .live-panel { margin: 28px 0 18px; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--subtle); }
 .live-panel header { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; margin-bottom: 16px; }
@@ -439,7 +429,6 @@ h2 { max-width: 640px; font-size: clamp(1.45rem, 3vw, 2.35rem); }
   .benchmark-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .glossary-grid { grid-template-columns: 1fr; }
   .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; }
-  .matrix-legend small { flex-basis: 100%; margin-left: 0; }
 }
 
 @media (max-width: 480px) {

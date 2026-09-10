@@ -314,16 +314,6 @@ function renderTrend(stats) {
   renderTrendChart(stats);
 }
 
-function heatClass(mode, entry, teamCount) {
-  if (!entry) return "";
-  if (mode === "rank") {
-    if (entry.rank <= 3) return "heat-great";
-    if (entry.rank >= teamCount - 2) return "heat-bad";
-    return "heat-average";
-  }
-  return `heat-${entry.quality}`;
-}
-
 function renderMatrixControls(stats) {
   const root = byId("matrixControls");
   root.replaceChildren();
@@ -392,7 +382,6 @@ function renderMatrixTable(stats) {
       const week = weeksByNumber.get(weekNumber);
       const entry = week?.entries.find((candidate) => candidate.rosterId === team.rosterId);
       const classNames = [
-        heatClass(uiState.matrixMode, entry, stats.metadata.teamCount),
         week?.status === "live" ? "matrix-live-cell" : "",
         week ? "" : "matrix-future",
       ].filter(Boolean).join(" ");
@@ -435,22 +424,7 @@ function renderMatrixTable(stats) {
     });
   }
   table.append(thead, tbody, tfoot);
-  const legend = el("div", "matrix-legend");
-  if (uiState.matrixMode === "rank") {
-    legend.append(
-      el("span", "legend-great", "Top 3"),
-      el("span", "legend-average", "Middle"),
-      el("span", "legend-bad", "Bottom 3"),
-    );
-  } else {
-    legend.append(
-      el("span", "legend-great", `>${stats.metadata.greatWeekDelta} above median`),
-      el("span", "legend-average", `Within ±${stats.metadata.greatWeekDelta}`),
-      el("span", "legend-bad", `>${stats.metadata.greatWeekDelta} below median`),
-    );
-  }
-  legend.append(el("small", "", "Season averages use finalized weeks only."));
-  root.append(table, legend);
+  root.append(table);
 }
 
 function renderMatrix(stats) {
