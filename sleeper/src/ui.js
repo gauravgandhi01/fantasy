@@ -4,7 +4,6 @@ const COLORS = [
 ];
 
 const uiState = {
-  overviewSort: { key: "total", direction: "desc" },
   statSort: { key: "total", direction: "desc" },
   selectedRosters: new Set(),
   matrixMode: "score",
@@ -82,16 +81,6 @@ function makeTeamLabel(team) {
   copy.append(el("strong", "", team.teamName), el("span", "", team.managerName));
   label.append(makeAvatar(team), copy);
   return label;
-}
-
-function metricCard(label, value, note, featured = false) {
-  const card = el("article", `metric-card compact${featured ? " featured" : ""}`);
-  card.append(
-    el("span", "metric-kicker", label),
-    el("strong", "", value),
-    el("span", "metric-note", note),
-  );
-  return card;
 }
 
 function emptyState(title, body, mark = "TL") {
@@ -175,118 +164,6 @@ function renderNotice(stats, context) {
   region.append(notice);
 }
 
-function renderSummary(stats) {
-  const grid = byId("summaryGrid");
-  grid.replaceChildren();
-  if (!stats.weeks.length) {
-    grid.append(
-      metricCard("Season", "Preseason", "Finalized scores appear automatically.", true),
-      metricCard("Teams", stats.metadata.teamCount, "Tracked each week"),
-      metricCard("Scoring", stats.metadata.scoringLabel || "Custom", "Sleeper league settings"),
-      metricCard("Regular season", `${stats.metadata.regularSeasonEnd} weeks`, `Playoffs start Week ${stats.metadata.playoffWeekStart}`),
-    );
-    return;
-  }
-
-  const leader = stats.teams[0];
-  const high = stats.weeks
-    .flatMap((week) => week.entries.map((entry) => ({ ...entry, week: week.week })))
-    .sort((a, b) => b.score - a.score)[0];
-  const highTeam = stats.teams.find((team) => team.rosterId === high?.rosterId);
-  const consistent = [...stats.teams]
-    .filter((team) => Number.isFinite(team.scoreDeviation))
-    .sort((a, b) => a.scoreDeviation - b.scoreDeviation)[0];
-
-  grid.append(
-    metricCard("Points leader", point(leader?.total), leader?.teamName || "No data", true),
-    metricCard("League average", point(stats.league.overallMean), `${stats.league.scoreCount} finalized team scores`),
-    metricCard("League median", point(stats.league.overallMedian), "Middle score across the season"),
-    metricCard("Highest week", point(high?.score), highTeam ? `${highTeam.teamName} · Week ${high.week}` : "No data"),
-    metricCard("Score spread", point(stats.league.scoreDeviation), "Sample standard deviation"),
-    metricCard("Most consistent", point(consistent?.scoreDeviation), consistent?.teamName || "Waiting for two weeks"),
-  );
-}
-
-function overviewTable(stats) {
-  const panel = el("section", "panel section-panel");
-  const heading = el("div", "section-heading compact");
-  const title = el("div");
-  title.append(el("p", "eyebrow accent", "The table that matters"), el("h2", "", "Season leaderboard"));
-  heading.append(title, el("p", "section-note", "Finalized regular-season scoring only."));
-  panel.append(heading);
-
-  const scroll = el("div", "table-scroll");
-  const table = el("table", "data-table");
-  table.append(el("caption", "visually-hidden", "True League season scoring leaderboard"));
-  const columns = [
-    { label: "Total", key: "total", format: point },
-    { label: "Average", key: "average", format: point },
-    { label: "Median", key: "medianWinPct", format: (_, team) => team.medianRecord },
-    { label: "Median W%", key: "medianWinPct", format: percentage },
-    { label: "Avg ± median", key: "averageDeltaMedian", format: signed },
-    { label: "Avg rank", key: "averageRank", format: rank },
-    { label: "Great", key: "greatWeeks", format: integer },
-    { label: "Bad", key: "badWeeks", format: integer },
-  ];
-  const headRow = el("tr");
-  const teamHead = el("th", "", "Team");
-  teamHead.scope = "col";
-  headRow.append(teamHead);
-  columns.forEach((column) => {
-    const th = el("th");
-    th.scope = "col";
-    th.append(sortButton(column.label, column.key, uiState.overviewSort, (sort) => {
-      uiState.overviewSort = sort;
-      renderOverview(stats);
-    }));
-    headRow.append(th);
-  });
-  const thead = el("thead");
-  thead.append(headRow);
-  const tbody = el("tbody");
-  sortedTeams(stats.teams, uiState.overviewSort).forEach((team) => {
-    const row = el("tr");
-    const identity = el("td");
-    identity.append(makeTeamLabel(team));
-    row.append(identity);
-    columns.forEach((column) => {
-      const cell = el("td");
-      const value = column.format(team[column.key], team);
-      if (column.key === "averageDeltaMedian") cell.className = team[column.key] > 0 ? "positive" : team[column.key] < 0 ? "negative" : "";
-      if (column.label === "Median") cell.append(el("span", "record-pill", value));
-      else cell.textContent = value;
-      row.append(cell);
-    });
-    tbody.append(row);
-  });
-  table.append(thead, tbody);
-  scroll.append(table);
-  panel.append(scroll);
-  return panel;
-}
-
-function rosterPanel(stats) {
-  const panel = el("section", "panel section-panel");
-  const heading = el("div", "section-heading compact");
-  const title = el("div");
-  title.append(el("p", "eyebrow accent", "Opening lineup"), el("h2", "", "The 2026 league"));
-  heading.append(title, el("p", "section-note", "Team names and avatars stay in sync with Sleeper."));
-  const grid = el("div", "roster-grid");
-  stats.teams.forEach((team) => {
-    const card = el("article", "roster-card");
-    card.append(makeAvatar(team), el("strong", "", team.teamName), el("span", "", team.managerName));
-    grid.append(card);
-  });
-  panel.append(heading, grid);
-  return panel;
-}
-
-function renderOverview(stats) {
-  const root = byId("overviewContent");
-  root.replaceChildren(stats.weeks.length ? overviewTable(stats) : rosterPanel(stats));
-  renderMatrix(stats);
-}
-
 function colorForTeam(team, teams) {
   const index = teams.findIndex((entry) => entry.rosterId === team.rosterId);
   return COLORS[(index < 0 ? team.rosterId : index) % COLORS.length];
@@ -307,7 +184,8 @@ function renderLiveWeek(stats, context) {
   const statusLabel = { awaiting_scoring: "Awaiting scoring", provisional: "Provisional", final: "Final" }[current.status];
   const panel = el("section", "panel section-panel");
   const header = el("div", "section-heading compact");
-  header.append(el("h2", "", `Week ${current.week} matchups`), el("span", "live-badge", statusLabel));
+  header.append(el("h2", "", `Week ${current.week} matchups`));
+  if (current.status !== "provisional") header.append(el("span", "live-badge", statusLabel));
   const note = el("p", "section-note matchup-updated", `Updated ${dateTime(context.cachedAt)} · Use Refresh for new scores.`);
   const cards = el("div", "matchup-grid");
   current.matchups.forEach((matchup) => {
@@ -505,7 +383,7 @@ function renderMatrixTable(stats) {
   thead.append(head);
 
   const tbody = el("tbody");
-  stats.teams.forEach((team) => {
+  sortedTeams(stats.teams, { key: "total", direction: "desc" }).forEach((team) => {
     const row = el("tr");
     const identity = el("td");
     identity.append(makeTeamLabel(team));
@@ -757,12 +635,6 @@ export function renderLoading() {
   byId("liveWeekRegion").replaceChildren(el("p", "section-note", "Loading matchups…"));
   byId("matrixControls").replaceChildren();
   byId("matrixTable").replaceChildren(emptyState("Loading weekly scores", "Connecting to Sleeper.", "↻"));
-  byId("summaryGrid").replaceChildren(
-    metricCard("Season status", "Loading", "Connecting to Sleeper.", true),
-    metricCard("Teams", "—", "Loading league members."),
-    metricCard("Regular season", "—", "Reading league settings."),
-  );
-  byId("overviewContent").replaceChildren(emptyState("Opening the scoring room", "Fetching the latest league data from Sleeper.", "↻"));
 }
 
 export function renderError(error) {
@@ -770,7 +642,6 @@ export function renderError(error) {
   byId("noticeRegion").replaceChildren();
   byId("statusTitle").textContent = "Sleeper unavailable";
   byId("statusDetail").textContent = "No saved league data is available";
-  byId("summaryGrid").replaceChildren();
   byId("matrixControls").replaceChildren();
   byId("matrixTable").replaceChildren(emptyState("Scores unavailable", error?.message || "Sleeper data could not be loaded.", "!"));
   const panel = el("section", "panel error-panel");
@@ -779,14 +650,13 @@ export function renderError(error) {
   retry.type = "button";
   retry.addEventListener("click", refreshHandler);
   panel.append(retry);
-  byId("overviewContent").replaceChildren(panel);
+  byId("matrixTable").replaceChildren(panel);
 }
 
 export function renderDashboard(stats, context = {}) {
   renderHeader(stats, context);
   renderNotice(stats, context);
-  renderSummary(stats);
-  renderOverview(stats);
+  renderMatrix(stats);
   renderWeekly(stats);
   renderLiveWeek(stats, context);
   renderStatbook(stats);
