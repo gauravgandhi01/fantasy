@@ -3,31 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101a17">
-  <meta name="description" content="True League's live 2026 Sleeper scoring dashboard.">
+  <meta name="theme-color" content="#f5f5f6">
+  <meta name="description" content="TrueWatch — weekly statistics and live matchups for True League.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="True League · 2026 Scoring Room">
+  <meta property="og:title" content="TrueWatch · True League">
   <meta property="og:description" content="Live weekly scoring context, consistency, and rank for True League.">
-  <meta property="og:image" content="__PUBLIC_BASE_URL__/public/og.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="True League · 2026 Scoring Room">
+  <meta property="og:url" content="__PUBLIC_BASE_URL__/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="TrueWatch · True League">
   <meta name="twitter:description" content="Live weekly scoring context, consistency, and rank for True League.">
-  <meta name="twitter:image" content="__PUBLIC_BASE_URL__/public/og.png">
-  <title>True League · 2026 Scoreboard</title>
+
+  <title>TrueWatch · League statistics</title>
+  <link rel="icon" href="./public/favicon.svg" type="image/svg+xml">
+  <script src="./src/theme.js"></script>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to statistics</a>
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="./" aria-label="True League home">
-        <span class="brand-mark" aria-hidden="true">TL</span>
+      <a class="brand" href="./" aria-label="TrueWatch home">
+        <span class="brand-logo" aria-hidden="true">
+          <img class="logo-light" src="./logo.png" alt="" width="1402" height="1122">
+          <img class="logo-dark" src="./logo_white.png" alt="" width="1376" height="1143">
+        </span>
         <span>
-          <span class="eyebrow" id="brandSeason">Sleeper · 2026</span>
-          <strong id="brandName">True League</strong>
+          <span class="eyebrow" id="brandSeason">True League · 2026</span>
+          <strong id="brandName" class="visually-hidden">TrueWatch</strong>
         </span>
       </a>
       <div class="header-actions">
+        <label class="theme-control">
+          <span class="visually-hidden">Color theme</span>
+          <select id="themeSelect" aria-label="Color theme">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
         <div class="data-status" id="dataStatus" role="status" aria-live="polite">
           <span class="status-dot" aria-hidden="true"></span>
           <span>
@@ -108,7 +121,7 @@
 
   <footer class="site-footer">
     <div class="shell footer-inner">
-      <span>True League · 2026 regular season</span>
+      <span>TrueWatch · True League</span>
       <span>League data from <a href="https://sleeper.com/" rel="noreferrer">Sleeper</a></span>
     </div>
   </footer>

@@ -115,7 +115,7 @@ test("HTTP serves isolated assets, freshness, initialization failures and durabl
   assert.equal((await fetch(`${base}/api/dashboard`)).status, 503);
   assert.equal((await fetch(`${base}/healthz`)).status, 200);
   const html = await (await fetch(base)).text();
-  assert.match(html, /https:\/\/league.example\/public\/og.png/);
+  assert.match(html, /https:\/\/league.example\//);
   for (const path of ["/server/index.js", "/src/sleeper.js", "/src/config.js", "/tests/backend.test.js", "/package.json", "/.data/latest.json", "/render.yaml", "/build_true_league_dashboard.py"]) {
     assert.equal((await fetch(base + path)).status, 404, path);
   }

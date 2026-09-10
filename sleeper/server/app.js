@@ -33,7 +33,7 @@ export async function createApp({ service, publicBaseUrl = "http://localhost:417
     } catch { res.status(503).json({ status: "unhealthy", storage: "unavailable", dataAvailable: Boolean(service.saved) }); }
   });
   app.get("/", (req, res) => { res.set("Cache-Control", "no-cache").type("html").send(html); });
-  for (const asset of ["styles.css", "src/app.js", "src/ui.js", "public/og.png"]) {
+  for (const asset of ["styles.css", "src/app.js", "src/ui.js", "src/theme.js", "logo.png", "logo_white.png", "public/favicon.svg", "public/og.png"]) {
     app.get(`/${asset}`, (req, res) => res.sendFile(join(root, asset), { maxAge: 0 }));
   }
   app.use((req, res) => res.status(404).json({ error: "Not found" }));

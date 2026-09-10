@@ -83,7 +83,7 @@ function makeTeamLabel(team) {
   return label;
 }
 
-function emptyState(title, body, mark = "TL") {
+function emptyState(title, body, mark = "TW") {
   const node = el("div", "empty-state");
   node.append(el("span", "empty-mark", mark), el("h2", "", title), el("p", "", body));
   return node;
@@ -122,8 +122,8 @@ function sortButton(label, key, state, onChange) {
 
 function renderHeader(stats, context) {
   const { metadata } = stats;
-  byId("brandName").textContent = metadata.name;
-  byId("brandSeason").textContent = `Sleeper · ${metadata.season}`;
+  byId("brandName").textContent = "TrueWatch";
+  byId("brandSeason").textContent = `${metadata.name} · ${metadata.season}`;
   const completed = metadata.completedWeekCount;
 
   if (stats.liveWeek) {
